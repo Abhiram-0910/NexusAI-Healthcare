@@ -16,8 +16,8 @@ class LLMService:
         
         if self.gemini_key:
             genai.configure(api_key=self.gemini_key)
-            self.model = genai.GenerativeModel('models/gemini-2.5-flash')
-            print("✅ LLM Service: Using Google Gemini 2.5 Flash")
+            self.model = genai.GenerativeModel('models/gemini-1.5-flash')
+            print("✅ LLM Service: Using Google Gemini 1.5 Flash")
         elif self.openai_key and OPENAI_AVAILABLE:
             self.client = OpenAI(api_key=self.openai_key)
             print("✅ LLM Service: Using OpenAI GPT")

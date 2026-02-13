@@ -35,22 +35,32 @@ export default function ExplainabilityPage({ report, reportScan, lang, t, access
     const avoidFoods = report.avoidFoods || scanData.avoid_foods || [];
     const actionNeeded = report.actionNeeded || scanData.action_needed || '';
 
-    // Decision path changes based on whether it's a report or vitals
-    const decisionSteps = isReportBased ? [
-        { step: 1, label: lang === 'hi' ? 'रिपोर्ट अपलोड' : lang === 'te' ? 'రిపోర్ట్ అప్‌లోడ్' : 'Report Upload', detail: `${reportType} uploaded for analysis`, icon: '📄', color: 'bg-blue-100 text-blue-700' },
-        { step: 2, label: lang === 'hi' ? 'AI दृष्टि विश्लेषण' : lang === 'te' ? 'AI దృష్టి విశ్లేషణ' : 'AI Vision Analysis', detail: 'Gemini 2.5 Flash multimodal analyzed the image', icon: '👁️', color: 'bg-purple-100 text-purple-700' },
-        { step: 3, label: lang === 'hi' ? 'निष्कर्ष निकालना' : lang === 'te' ? 'ఫలితాలు గుర్తింపు' : 'Finding Extraction', detail: `Extracted ${keyFindings.length} key findings from report`, icon: '🔍', color: 'bg-indigo-100 text-indigo-700' },
-        { step: 4, label: lang === 'hi' ? 'गंभीरता आकलन' : lang === 'te' ? 'తీవ్రత అంచనా' : 'Severity Assessment', detail: `Severity: ${report.risk_score || 5}/10 — ${severityAnalogy}`, icon: '⚠️', color: 'bg-yellow-100 text-yellow-700' },
-        { step: 5, label: lang === 'hi' ? 'आहार सुझाव' : lang === 'te' ? 'ఆహార సూచనలు' : 'Diet Recommendations', detail: `${eatFoods.length} foods to eat, ${avoidFoods.length} to avoid`, icon: '🥗', color: 'bg-green-100 text-green-700' },
-        { step: 6, label: lang === 'hi' ? 'कार्रवाई योजना' : lang === 'te' ? 'చర్య ప్రణాళిక' : 'Action Plan', detail: actionNeeded || 'Follow-up recommended', icon: '💊', color: 'bg-red-100 text-red-700' }
-    ] : [
-        { step: 1, label: lang === 'hi' ? 'लक्षण विश्लेषण' : lang === 'te' ? 'లక్షణ విశ్లేషణ' : 'Symptom Analysis', detail: 'AI identified input symptoms from body map & voice', icon: '🔍', color: 'bg-blue-100 text-blue-700' },
-        { step: 2, label: lang === 'hi' ? 'शारीरिक जांच' : lang === 'te' ? 'శారీరక డేటా' : 'Wearable Data Check', detail: 'Checked glucose, heart rate, BP, SpO2 from wearable device', icon: '⌚', color: 'bg-red-100 text-red-700' },
-        { step: 3, label: lang === 'hi' ? 'जोखिम गणना' : lang === 'te' ? 'ప్రమాద లెక్కింపు' : 'Risk Calculation', detail: `Risk level: ${riskLevel.toUpperCase()}`, icon: '⚠️', color: 'bg-yellow-100 text-yellow-700' },
-        { step: 4, label: lang === 'hi' ? 'रोग पहचान' : lang === 'te' ? 'వ్యాధి గుర్తింపు' : 'Disease Detection', detail: diseases.map(d => d.name).join(', ') || 'Conditions identified', icon: '🏥', color: 'bg-green-100 text-green-700' },
-        { step: 5, label: lang === 'hi' ? 'उपचार सुझाव' : lang === 'te' ? 'చికిత్స సూచన' : 'Treatment Suggestion', detail: 'Treatment plan generated with medications & diet', icon: '💊', color: 'bg-purple-100 text-purple-700' }
-    ];
+    let decisionSteps = [];
 
+    if (isReportBased) {
+        decisionSteps = [
+            { step: 1, label: lang === 'hi' ? 'रिपोर्ट अपलोड' : lang === 'te' ? 'రిపోర్ట్ అప్‌లోడ్' : 'Report Upload', detail: `${reportType} uploaded for analysis`, icon: '📄', color: 'bg-blue-100 text-blue-700' },
+            { step: 2, label: lang === 'hi' ? 'AI दृष्टि विश्लेषण' : lang === 'te' ? 'AI దృష్టి విశ్లేషణ' : 'Report Analysis', detail: 'Computer Vision analyzed the image structure', icon: '👁️', color: 'bg-purple-100 text-purple-700' },
+            { step: 3, label: lang === 'hi' ? 'निष्कर्ष निकालना' : lang === 'te' ? 'ఫలితాలు గుర్తింపు' : 'Finding Extraction', detail: `Extracted ${keyFindings.length} key findings from report`, icon: '🔍', color: 'bg-indigo-100 text-indigo-700' },
+            { step: 4, label: lang === 'hi' ? 'गंभीरता आकलन' : lang === 'te' ? 'తీవ్రత అంచనా' : 'Severity Assessment', detail: `Severity: ${report.risk_score || 5}/10 — ${severityAnalogy}`, icon: '⚠️', color: 'bg-yellow-100 text-yellow-700' },
+            { step: 5, label: lang === 'hi' ? 'आहार सुझाव' : lang === 'te' ? 'ఆహార సూచనలు' : 'Diet Recommendations', detail: `${eatFoods.length} foods to eat, ${avoidFoods.length} to avoid`, icon: '🥗', color: 'bg-green-100 text-green-700' },
+            { step: 6, label: lang === 'hi' ? 'कार्रवाई योजना' : lang === 'te' ? 'చర్య ప్రణాళిక' : 'Action Plan', detail: actionNeeded || 'Follow-up recommended', icon: '💊', color: 'bg-red-100 text-red-700' }
+        ];
+    } else {
+        decisionSteps = [
+            { step: 1, label: lang === 'hi' ? 'लक्षण विश्लेषण' : lang === 'te' ? 'లక్షణ విశ్లేషణ' : 'Symptom Analysis', detail: 'AI identified input symptoms from body map & voice', icon: '🔍', color: 'bg-blue-100 text-blue-700' }
+        ];
+
+        if (riskLevel) {
+            decisionSteps.push({ step: 2, label: lang === 'hi' ? 'शारीरिक जांच' : lang === 'te' ? 'శారీరక డేటా' : 'Wearable Data Check', detail: 'Checked glucose, heart rate, BP, SpO2 (if available)', icon: '⌚', color: 'bg-red-100 text-red-700' });
+        }
+
+        decisionSteps.push(
+            { step: 3, label: lang === 'hi' ? 'जोखिम गणना' : lang === 'te' ? 'ప్రమాద లెక్కింపు' : 'Risk Calculation', detail: `Risk level: ${riskLevel.toUpperCase()}`, icon: '⚠️', color: 'bg-yellow-100 text-yellow-700' },
+            { step: 4, label: lang === 'hi' ? 'रोग पहचान' : lang === 'te' ? 'వ్యాధి గుర్తింపు' : 'Disease Detection', detail: diseases.map(d => d.name).join(', ') || 'Conditions identified', icon: '🏥', color: 'bg-green-100 text-green-700' },
+            { step: 5, label: lang === 'hi' ? 'उपचार सुझाव' : lang === 'te' ? 'చికిత్స సూచన' : 'Treatment Suggestion', detail: 'Treatment plan generated with medications & diet', icon: '💊', color: 'bg-purple-100 text-purple-700' }
+        );
+    }
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             {/* Page Title */}

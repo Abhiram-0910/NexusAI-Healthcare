@@ -91,6 +91,7 @@ export default function DiagnosisPage({ lang, t, onDiagnosisComplete, onReportSc
     setReport(autoReport);
     setDiagnosisResults({ ...autoReport, recommended_foods: scanData.eat_foods || [], avoid_foods: scanData.avoid_foods || [] });
     setActiveTab('result');
+    if (onDiagnosisComplete) onDiagnosisComplete(autoReport);
   };
 
   const handleDiagnose = async () => {
@@ -221,21 +222,30 @@ export default function DiagnosisPage({ lang, t, onDiagnosisComplete, onReportSc
                   {wearableConnected ? '✅ SENSORS SYNCED' : '📡 SYNC SENSORS'}
                 </button>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {[
-                  { label: 'GLUCOSE', unit: 'mg/dL', val: glucose, set: setGlucose },
-                  { label: 'HR', unit: 'BPM', val: heartRate, set: setHeartRate },
-                  { label: 'SPO2', unit: '%', val: spo2, set: setSpo2 },
-                  { label: 'TEMP', unit: '°F', val: temperature, set: setTemperature },
-                  { label: 'SYSTOLIC', unit: 'mmHg', val: systolic, set: setSystolic },
-                  { label: 'DIASTOLIC', unit: 'mmHg', val: diastolic, set: setDiastolic },
-                ].map(vital => (
-                  <div key={vital.label} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">{vital.label} ({vital.unit})</label>
-                    <input type="number" value={vital.val} onChange={e => vital.set(e.target.value)} className="w-full bg-transparent font-black text-xl text-slate-900 border-none focus:outline-none" />
-                  </div>
-                ))}
-              </div>
+
+              {/* Vitals Inputs - Only visible if Wearable Connected */}
+              {wearableConnected ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {[
+                    { label: 'GLUCOSE', unit: 'mg/dL', val: glucose, set: setGlucose },
+                    { label: 'HR', unit: 'BPM', val: heartRate, set: setHeartRate },
+                    { label: 'SPO2', unit: '%', val: spo2, set: setSpo2 },
+                    { label: 'TEMP', unit: '°F', val: temperature, set: setTemperature },
+                    { label: 'SYSTOLIC', unit: 'mmHg', val: systolic, set: setSystolic },
+                    { label: 'DIASTOLIC', unit: 'mmHg', val: diastolic, set: setDiastolic },
+                  ].map(vital => (
+                    <div key={vital.label} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">{vital.label} ({vital.unit})</label>
+                      <input type="number" value={vital.val} onChange={e => vital.set(e.target.value)} className="w-full bg-transparent font-black text-xl text-slate-900 border-none focus:outline-none" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-400 border-2 border-dashed border-slate-100 rounded-xl">
+                  <Activity size={32} className="mx-auto mb-2 opacity-20" />
+                  <p className="text-sm font-medium">Connect wearable device to enable live telemetry</p>
+                </div>
+              )}
             </div>
 
             {/* 4. Symptoms (NEXUS_2 Storytelling integration) */}
@@ -258,8 +268,15 @@ export default function DiagnosisPage({ lang, t, onDiagnosisComplete, onReportSc
               </div>
             </div>
 
-            <button onClick={handleDiagnose} disabled={loading} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xl hover:bg-black transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl">
-              {loading ? <><div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> RUNNING BRAIN ANALYTICS...</> : <><Brain size={28} /> SYNC ONE BRAIN</>}
+            <button
+              onClick={handleDiagnose}
+              disabled={loading || !wearableConnected}
+              className={`w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 shadow-xl transition-all ${wearableConnected
+                ? 'bg-slate-900 text-white hover:bg-black'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                }`}
+            >
+              {loading ? <><div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> RUNNING BRAIN ANALYTICS...</> : <><Brain size={28} /> {wearableConnected ? 'SYNC ONE BRAIN (WEARABLE)' : 'CONNECT WEARABLE TO SYNC'}</>}
             </button>
           </motion.div>
         ) : (
